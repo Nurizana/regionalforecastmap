@@ -6,7 +6,7 @@ L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Oc
 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Reference/MapServer/tile/{z}/{y}/{x}').addTo(map);
 
 // Add 5-Degree Grid
-L.simpleGraticule({ interval: 5, color: '#333', weight: 0.5, opacity: 0.5 }).addTo(map);
+//L.simpleGraticule({ interval: 5, color: '#333', weight: 0.5, opacity: 0.5 }).addTo(map);
 
 // Load the processed GeoTIFF from GitHub Data folder
 fetch('data/temp_24h.tif')
