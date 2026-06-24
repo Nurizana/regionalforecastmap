@@ -3,7 +3,7 @@ import os
 from datetime import datetime, timedelta
 
 # 1. Smart Time Calculator: Subtract 6 hours from current UTC time 
-# to guarantee we only ask for a forecast that NOAA has completely finished uploading.
+# to guarantee we ask for a forecast that NOAA has finished uploading.
 safe_time = datetime.utcnow() - timedelta(hours=6)
 date_str = safe_time.strftime('%Y%m%d')
 
@@ -44,10 +44,14 @@ with open(grib_file, 'wb') as f:
     
 print("Download complete. Converting to GeoTIFF format...")
 
-# 3. Convert format using GDAL
-   exit_code = os.system(f"gdal_translate -of GTiff -ot Float32 -a_nodata 9999 -a_srs EPSG:4326 {grib_file} {tif_file}")
+# 3. Convert format using GDAL (Left-aligned perfectly)
+exit_code = os.system(f"gdal_translate -of GTiff -ot Float32 -a_nodata 9999 -a_srs EPSG:4326 {grib_file} {tif_file}")
 
 if exit_code != 0:
     raise Exception("GDAL failed to convert the image!")
+
+# 4. Clean up the raw file to save GitHub storage space
+if os.path.exists(grib_file):
+    os.remove(grib_file)
 
 print("Successfully created the Temperature map!")
