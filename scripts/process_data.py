@@ -45,7 +45,7 @@ with open(grib_file, 'wb') as f:
 print("Download complete. Converting to GeoTIFF format...")
 
 # 3. Convert format using GDAL
-exit_code = os.system(f"gdal_translate -of GTiff -a_srs EPSG:4326 {grib_file} {tif_file}")
+   exit_code = os.system(f"gdal_translate -of GTiff -ot Float32 -a_nodata 9999 -a_srs EPSG:4326 {grib_file} {tif_file}")
 
 if exit_code != 0:
     raise Exception("GDAL failed to convert the image!")
