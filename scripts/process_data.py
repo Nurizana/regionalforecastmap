@@ -44,8 +44,8 @@ for f_hour in f_hours:
             with open(grib_file, 'wb') as f:
                 f.write(response.content)
                 
-            # Clean GDAL command ensuring accurate floating point numbers
-            os.system(f"gdal_translate -of GTiff -ot Float32 {grib_file} {tif_file}")
+            # Added -a_srs EPSG:4326 to fix the map projection crash
+            os.system(f"gdal_translate -of GTiff -ot Float32 -a_srs EPSG:4326 {grib_file} {tif_file}")
             
             if os.path.exists(grib_file):
                 os.remove(grib_file)
