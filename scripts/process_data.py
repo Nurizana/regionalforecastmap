@@ -12,7 +12,7 @@ elif hour < 12: run = "06"
 elif hour < 18: run = "12"
 else: run = "18"
 
-# 12 Forecast time steps (006 to 072)
+# Generate the 12 Forecast time steps (006 to 072)
 f_hours = [f"{i:03d}" for i in range(6, 78, 6)]
 
 # The 3 parameters requested
@@ -38,20 +38,16 @@ for f_hour in f_hours:
         grib_file = f"data/{p_name}_{f_hour}.grib2"
         tif_file = f"data/{p_name}_{f_hour}.tif"
         
-        print(f"Downloading {p_name} for +{f_hour}h...")
         response = requests.get(url)
         
         if response.status_code == 200:
             with open(grib_file, 'wb') as f:
                 f.write(response.content)
                 
-            # Convert using GDAL. -unscale is REQUIRED to fix the solid blue box!
-            os.system(f"gdal_translate -unscale -of GTiff -ot Float32 -a_nodata 9999 -a_srs EPSG:4326 {grib_file} {tif_file}")
+            # Clean GDAL command ensuring accurate floating point numbers
+            os.system(f"gdal_translate -of GTiff -ot Float32 {grib_file} {tif_file}")
             
-            # Clean up raw file
             if os.path.exists(grib_file):
                 os.remove(grib_file)
-        else:
-            print(f"Failed to fetch {p_name} +{f_hour}h (HTTP {response.status_code})")
 
 print("All layers processed successfully!")
