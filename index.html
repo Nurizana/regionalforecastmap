@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Regional Forecast Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="style.css" />
@@ -8,8 +9,33 @@
 <body>
     <div id="map"></div>
     
+    <div id="ui-panel" class="control-box">
+        <h3>Forecast Controls</h3>
+        <label for="paramSelect"><b>Parameter:</b></label>
+        <select id="paramSelect">
+            <option value="temp">2m Temperature</option>
+            <option value="rain">Rainfall</option>
+            <option value="pressure">MSLP Pressure</option>
+        </select>
+        
+        <label for="timeSelect" style="margin-top: 10px; display: block;"><b>Forecast Time (+ hours):</b></label>
+        <select id="timeSelect">
+            <option value="006">+ 06 Hours</option>
+            <option value="012">+ 12 Hours</option>
+            <option value="018">+ 18 Hours</option>
+            <option value="024" selected>+ 24 Hours</option>
+            <option value="030">+ 30 Hours</option>
+            <option value="036">+ 36 Hours</option>
+            <option value="042">+ 42 Hours</option>
+            <option value="048">+ 48 Hours</option>
+            <option value="054">+ 54 Hours</option>
+            <option value="060">+ 60 Hours</option>
+            <option value="066">+ 66 Hours</option>
+            <option value="072">+ 72 Hours</option>
+        </select>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet.simplegraticule@1.0.2/L.SimpleGraticule.js"></script>
     <script src="https://unpkg.com/georaster"></script>
     <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
     <script src="map.js"></script>
