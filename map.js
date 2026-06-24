@@ -18,7 +18,8 @@ fetch('data/temp_24h.tif')
           opacity: 0.7,
           resolution: 128,
           pixelValuesToColorFn: values => {
-              const temp = values[0];
+              const kelvin = values[0];
+              const temp = kelvin - 273.15; // Convert Kelvin to Celsius
               if (temp < 0) return '#0000ff'; 
               if (temp > 0 && temp < 20) return '#00ff00'; 
               if (temp >= 20) return '#ff0000'; 

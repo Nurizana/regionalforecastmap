@@ -1,32 +1,40 @@
-import xarray as xr
-import rioxarray
+import requests
 import os
 from datetime import datetime
 
-# Define bounds: 15S to 55N, 60E to 110W (110W is 250E in NOAA systems)
-lat_min, lat_max = -15.0, 55.0
-lon_min, lon_max = 60.0, 250.0
+# NOAA's New GRIB Filter System
+date_str = datetime.utcnow().strftime('%Y%m%d')
+run = "00"
+f_hour = "024"
+
+# Request 2m Temperature for 15S to 55N, 60E to 110W (250E)
+url = (
+    f"https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl"
+    f"?file=gfs.t{run}z.pgrb2.0p25.f{f_hour}"
+    f"&lev_2_m_above_ground=on&var_TMP=on"
+    f"&subregion=&leftlon=60&rightlon=250&toplat=55&bottomlat=-15"
+    f"&dir=%2Fgfs.{date_str}%2F{run}%2Fatmos"
+)
 
 os.makedirs("data", exist_ok=True)
+grib_file = "data/temp_24h.grib2"
+tif_file = "data/temp_24h.tif"
 
-# Access NOAA OpenDAP Server (GFS 0.25 Degree)
-date_str = datetime.utcnow().strftime('%Y%m%d')
-url = f"https://nomads.ncep.noaa.gov/dods/gfs_0p25/gfs{date_str}/gfs_0p25_00z"
+print("Downloading from NOAA GRIB Filter...")
+response = requests.get(url)
 
-try:
-    print("Connecting to NOAA...")
-    ds = xr.open_dataset(url)
+if response.status_code == 200:
+    with open(grib_file, 'wb') as f:
+        f.write(response.content)
+        
+    print("Download complete. Converting to GeoTIFF...")
+    # Convert raw NOAA data to web map format
+    os.system(f"gdal_translate -of GTiff -a_srs EPSG:4326 {grib_file} {tif_file}")
     
-    # Clip data and select the 24hr forecast (index 8, since it's 3-hourly)
-    subset = ds.sel(lon=slice(lon_min, lon_max), lat=slice(lat_min, lat_max)).isel(time=8)
-    
-    # Extract 2m Temperature and convert from Kelvin to Celsius
-    temp_c = subset.tmp2m - 273.15
-    temp_c = temp_c.rio.write_crs("epsg:4326")
-    
-    # Save as Web-Friendly GeoTIFF
-    temp_c.rio.to_raster("data/temp_24h.tif")
+    # Remove raw file to save space
+    if os.path.exists(grib_file):
+        os.remove(grib_file)
+        
     print("Successfully created Temperature GeoTIFF!")
-    
-except Exception as e:
-    print(f"Error fetching data: {e}")
+else:
+    print(f"Failed! NOAA returned HTTP {response.status_code}")

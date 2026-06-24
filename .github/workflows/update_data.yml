@@ -18,7 +18,9 @@ jobs:
           
       - name: Install Dependencies
         run: |
-          pip install -r scripts/requirements.txt
+          sudo apt-get update
+          sudo apt-get install -y gdal-bin
+          pip install requests
           
       - name: Run Data Processor
         run: python scripts/process_data.py
